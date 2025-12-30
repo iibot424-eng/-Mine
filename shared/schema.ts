@@ -1,18 +1,45 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// === TABLE DEFINITIONS ===
+export const botConfig = pgTable("bot_config", {
+  id: serial("id").primaryKey(),
+  serverIp: text("server_ip").notNull().default("localhost"),
+  serverPort: integer("server_port").notNull().default(25565),
+  username: text("username").notNull().default("ReplitBot"),
+  authType: text("auth_type").notNull().default("offline"), // 'offline' or 'microsoft'
+  version: text("version").default("1.20.1"),
+  masterName: text("master_name").default(""), // Player to obey commands from
+  
+  // Feature Toggles
+  isAutoFarm: boolean("is_auto_farm").default(false),
+  isAutoDefense: boolean("is_auto_defense").default(false),
+  isAutoTrade: boolean("is_auto_trade").default(false),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const botLogs = pgTable("bot_logs", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(), // 'chat', 'info', 'error', 'warning'
+  message: text("message").notNull(),
+  timestamp: text("timestamp").notNull(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// === SCHEMAS ===
+export const insertBotConfigSchema = createInsertSchema(botConfig).omit({ id: true });
+export const insertBotLogSchema = createInsertSchema(botLogs).omit({ id: true });
+
+// === TYPES ===
+export type BotConfig = typeof botConfig.$inferSelect;
+export type InsertBotConfig = z.infer<typeof insertBotConfigSchema>;
+export type BotLog = typeof botLogs.$inferSelect;
+
+// Runtime Status (Not in DB, used for API responses)
+export interface BotStatus {
+  online: boolean;
+  health: number;
+  food: number;
+  position: { x: number; y: number; z: number } | null;
+  nearbyPlayers: number;
+  inventoryFull: boolean;
+}
