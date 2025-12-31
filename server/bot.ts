@@ -44,7 +44,7 @@ class BotManager {
           host: config.host,
           port: config.port,
           username: config.username,
-          version: config.version || false,
+          version: config.version || undefined,
           auth: config.auth as any,
         });
         this.setupJavaEvents();
