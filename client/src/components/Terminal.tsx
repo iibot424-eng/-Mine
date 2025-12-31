@@ -70,7 +70,13 @@ export function Terminal() {
           logs?.map((log, i) => (
             <div key={i} className="flex gap-3 hover:bg-white/5 px-1 py-0.5 transition-colors">
               <span className="text-muted-foreground shrink-0 text-xs py-0.5">
-                [{format(new Date(log.timestamp), 'HH:mm:ss')}]
+                [{(() => {
+                  try {
+                    return format(new Date(log.timestamp), 'HH:mm:ss');
+                  } catch (e) {
+                    return '--:--:--';
+                  }
+                })()}]
               </span>
               <span className={`${getLogColor(log.type)} break-all`}>
                 {log.type === 'chat' && <span className="opacity-70 mr-2">{'>'}</span>}

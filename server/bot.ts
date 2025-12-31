@@ -34,7 +34,7 @@ class BotManager {
           port: config.port,
           username: config.username,
           offline: config.auth === 'offline' || config.auth === 'bedrock',
-          version: config.version || '1.21.30'
+          version: config.version as any || '1.21.30'
         });
         this.setupBedrockEvents();
       } else {
@@ -122,7 +122,10 @@ class BotManager {
     this.bot.on('text', (packet: any) => {
       storage.addLog('chat', packet.message);
     });
-    this.bot.on('error', (err: any) => storage.addLog('error', `Bedrock Error: ${err}`));
+    this.bot.on('error', (err: any) => {
+      storage.addLog('error', `Bedrock Connection Error: ${err.message || err}`);
+      this._status.online = false;
+    });
     this.bot.on('close', () => {
       this._status.online = false;
       storage.addLog('warning', 'Bedrock connection closed.');

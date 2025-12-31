@@ -37,7 +37,7 @@ export function ConfigForm() {
     if (config) {
       const data = {
         ...config,
-        isBedrock: config.isBedrock ?? false,
+        isBedrock: !!config.isBedrock,
       } as InsertBotConfig;
       form.reset(data);
     }
