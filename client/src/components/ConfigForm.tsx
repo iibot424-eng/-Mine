@@ -47,7 +47,16 @@ export function ConfigForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data) => updateConfig(data as any))} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit((data) => {
+          const formattedData = {
+            ...data,
+            version: data.isBedrock ? (data.version || "1.21.30") : (data.version || "1.20.1")
+          };
+          updateConfig(formattedData as any);
+        })}
+        className="space-y-6"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* SERVER CONNECTION */}

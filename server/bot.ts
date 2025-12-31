@@ -25,6 +25,7 @@ class BotManager {
     if (this.bot) return;
 
     this.isBedrock = config.isBedrock;
+    await storage.clearLogs();
     await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${config.isBedrock ? 'Bedrock' : 'Java'})...`);
 
     try {
@@ -43,7 +44,7 @@ class BotManager {
           host: config.host,
           port: config.port,
           username: config.username,
-          version: config.version || '1.20.1',
+          version: config.version || false,
           auth: config.auth as any,
         });
         this.setupJavaEvents();
