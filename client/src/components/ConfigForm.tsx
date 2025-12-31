@@ -28,6 +28,7 @@ export function ConfigForm() {
       isAutoDefense: false,
       isAutoTrade: false,
       version: "1.20.1",
+      isBedrock: false,
     },
   });
 
@@ -221,7 +222,7 @@ export function ConfigForm() {
                     </div>
                     <FormControl>
                       <Switch
-                        checked={field.value}
+                        checked={field.value ?? false}
                         onCheckedChange={field.onChange}
                         className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-secondary"
                       />
@@ -243,7 +244,7 @@ export function ConfigForm() {
                     </div>
                     <FormControl>
                       <Switch
-                        checked={field.value}
+                        checked={field.value ?? false}
                         onCheckedChange={field.onChange}
                         className="data-[state=checked]:bg-destructive data-[state=unchecked]:bg-secondary"
                       />
@@ -265,7 +266,7 @@ export function ConfigForm() {
                     </div>
                     <FormControl>
                       <Switch
-                        checked={field.value}
+                        checked={field.value ?? false}
                         onCheckedChange={field.onChange}
                         className="data-[state=checked]:bg-yellow-500 data-[state=unchecked]:bg-secondary"
                       />
