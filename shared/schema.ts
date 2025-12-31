@@ -8,9 +8,10 @@ export const botConfig = pgTable("bot_config", {
   serverIp: text("server_ip").notNull().default("localhost"),
   serverPort: integer("server_port").notNull().default(25565),
   username: text("username").notNull().default("ReplitBot"),
-  authType: text("auth_type").notNull().default("offline"), // 'offline' or 'microsoft'
+  authType: text("auth_type").notNull().default("offline"), // 'offline', 'microsoft', or 'bedrock'
   version: text("version").default("1.20.1"),
   masterName: text("master_name").default(""), // Player to obey commands from
+  isBedrock: boolean("is_bedrock").default(false),
   
   // Feature Toggles
   isAutoFarm: boolean("is_auto_farm").default(false),

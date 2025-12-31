@@ -98,6 +98,7 @@ export function ConfigForm() {
                             <SelectValue placeholder="Select version" />
                           </SelectTrigger>
                           <SelectContent className="bg-card border-primary text-primary font-mono rounded-none">
+                            <SelectItem value="1.21.30">1.21.30 (Bedrock)</SelectItem>
                             <SelectItem value="1.20.1">1.20.1</SelectItem>
                             <SelectItem value="1.19.4">1.19.4</SelectItem>
                             <SelectItem value="1.18.2">1.18.2</SelectItem>
@@ -148,6 +149,7 @@ export function ConfigForm() {
                         <SelectContent className="bg-card border-primary text-primary font-mono rounded-none">
                           <SelectItem value="offline">OFFLINE (Cracked)</SelectItem>
                           <SelectItem value="microsoft">MICROSOFT (Official)</SelectItem>
+                          <SelectItem value="bedrock">BEDROCK (Mobile/Console)</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -171,6 +173,26 @@ export function ConfigForm() {
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isBedrock"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-none border border-primary/20 p-2 bg-black/30">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-xs font-mono text-primary flex items-center gap-2">
+                        <Server className="w-3 h-3" /> BEDROCK_PROTOCOL
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value || false}
+                        onCheckedChange={field.onChange}
+                        className="scale-75 data-[state=checked]:bg-primary data-[state=unchecked]:bg-secondary"
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

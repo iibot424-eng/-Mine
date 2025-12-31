@@ -6,23 +6,31 @@ export const errorSchemas = {
 };
 
 export const api = {
-  config: {
-    get: {
-      method: 'GET' as const,
-      path: '/api/config',
-      responses: {
-        200: insertBotConfigSchema.extend({ id: z.number() }),
+    config: {
+      get: {
+        method: 'GET' as const,
+        path: '/api/config',
+        responses: {
+          200: insertBotConfigSchema.extend({ 
+            id: z.number(),
+            isBedrock: z.boolean().nullable()
+          }),
+        },
+      },
+      update: {
+        method: 'POST' as const,
+        path: '/api/config',
+        input: insertBotConfigSchema.extend({
+          isBedrock: z.boolean().optional()
+        }),
+        responses: {
+          200: insertBotConfigSchema.extend({ 
+            id: z.number(),
+            isBedrock: z.boolean().nullable()
+          }),
+        },
       },
     },
-    update: {
-      method: 'POST' as const,
-      path: '/api/config',
-      input: insertBotConfigSchema,
-      responses: {
-        200: insertBotConfigSchema.extend({ id: z.number() }),
-      },
-    },
-  },
   bot: {
     start: {
       method: 'POST' as const,
