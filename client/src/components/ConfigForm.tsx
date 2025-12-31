@@ -35,7 +35,11 @@ export function ConfigForm() {
   // Reset form when data loads
   useEffect(() => {
     if (config) {
-      form.reset(config);
+      const data = {
+        ...config,
+        isBedrock: config.isBedrock ?? false,
+      } as InsertBotConfig;
+      form.reset(data);
     }
   }, [config, form]);
 
@@ -43,7 +47,7 @@ export function ConfigForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data) => updateConfig(data))} className="space-y-6">
+      <form onSubmit={form.handleSubmit((data) => updateConfig(data as InsertBotConfig))} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* SERVER CONNECTION */}
