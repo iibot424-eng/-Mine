@@ -151,11 +151,14 @@ class BotManager {
       storage.addLog('chat', `<${username}> ${message}`);
     });
 
-    this.bot.on('health', () => {
-      if (this.bot) {
-        this._status.health = this.bot.health;
-        this._status.food = this.bot.food;
-      }
+    this.bot.on('error', (err: any) => {
+      storage.addLog('error', `Java Bot Error: ${err.message || err}`);
+      this._status.online = false;
+    });
+
+    this.bot.on('kicked', (reason: string) => {
+      storage.addLog('error', `Java Bot Kicked: ${reason}`);
+      this._status.online = false;
     });
 
     this.bot.on('move', () => {
