@@ -28,9 +28,11 @@ export async function registerRoutes(
   app.post(api.config.update.path, async (req, res) => {
     try {
       const input = api.config.update.input.parse(req.body);
+      console.log("Server received config update:", input);
       const updated = await storage.updateBotConfig(input);
       res.json(updated);
     } catch (err) {
+      console.error("Config update validation failed:", err);
       res.status(400).json({ message: 'Invalid config' });
     }
   });

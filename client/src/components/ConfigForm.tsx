@@ -51,7 +51,8 @@ export function ConfigForm() {
         onSubmit={form.handleSubmit((data) => {
           const formattedData = {
             ...data,
-            version: data.isBedrock ? (data.version || "1.21.30") : (data.version || "1.20.1")
+            version: data.isBedrock ? (data.version || "1.21.30") : (data.version || "1.20.1"),
+            isBedrock: data.isBedrock ?? false
           };
           updateConfig(formattedData as any);
         })}
