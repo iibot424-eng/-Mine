@@ -37,9 +37,10 @@ class BotManager {
           host: config.host,
           port: config.port,
           username: config.username,
-          offline: config.auth === 'offline' || config.auth === 'bedrock',
+          offline: true,
           version: config.version as any || '1.21.30',
-          skipPing: true
+          skipPing: true,
+          connectTimeout: 10000
         });
         this.setupBedrockEvents();
       } else {
