@@ -49,7 +49,9 @@ class BotManager {
           port: config.port,
           username: config.username,
           version: config.version || undefined,
-          auth: config.auth as any,
+          auth: 'offline', // Force offline for Java
+          checkTimeoutInterval: 60000,
+          hideErrors: false
         });
         this.setupJavaEvents();
       }
@@ -144,6 +146,13 @@ class BotManager {
     this.bot.on('spawn', () => {
       this._status.online = true;
       storage.addLog('info', 'Java Bot spawned.');
+      // Also ensure we set online true here to sync state immediately
+      this._status.online = true;
+    });
+
+    this.bot.on('login', () => {
+      this._status.online = true;
+      storage.addLog('info', 'Java Bot logged in.');
     });
 
     this.bot.on('end', (reason: string) => {
