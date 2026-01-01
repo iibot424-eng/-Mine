@@ -155,6 +155,12 @@ class BotManager {
       storage.addLog('info', 'Java Bot logged in.');
     });
 
+    // Accept resource packs automatically (often required by servers)
+    this.bot.on('resource_pack', (url: string, hash: string) => {
+      storage.addLog('info', 'Server requested resource pack. Accepting...');
+      this.bot.acceptResourcePack();
+    });
+
     this.bot.on('end', (reason: string) => {
       this._status.online = false;
       storage.addLog('warning', `Java Bot disconnected: ${reason}`);
