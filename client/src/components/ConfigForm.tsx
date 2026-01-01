@@ -35,9 +35,10 @@ export function ConfigForm() {
   // Reset form when data loads
   useEffect(() => {
     if (config) {
+      console.log("Config loaded from server:", config);
       form.reset({
         ...config,
-        isBedrock: config.isBedrock ?? false,
+        isBedrock: config.isBedrock === true,
         masterName: config.masterName ?? "",
       });
     }

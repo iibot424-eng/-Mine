@@ -27,15 +27,18 @@ export class DatabaseStorage implements IStorage {
 
   async updateBotConfig(insertConfig: InsertBotConfig): Promise<BotConfig> {
     const existing = await this.getBotConfig();
+    console.log("Storage update request:", insertConfig);
     if (existing) {
       const [updated] = await db
         .update(botConfig)
         .set(insertConfig)
         .where(eq(botConfig.id, existing.id))
         .returning();
+      console.log("Storage updated result:", updated);
       return updated;
     } else {
       const [created] = await db.insert(botConfig).values(insertConfig).returning();
+      console.log("Storage created result:", created);
       return created;
     }
   }

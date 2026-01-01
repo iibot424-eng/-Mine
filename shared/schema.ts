@@ -35,6 +35,8 @@ export type BotConfig = typeof botConfig.$inferSelect;
 export type InsertBotConfig = z.infer<typeof insertBotConfigSchema>;
 export type BotLog = typeof botLogs.$inferSelect;
 
+export * from "./models/auth";
+
 // Runtime Status (Not in DB, used for API responses)
 export interface BotStatus {
   online: boolean;

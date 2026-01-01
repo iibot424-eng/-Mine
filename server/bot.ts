@@ -27,6 +27,9 @@ class BotManager {
     this.isBedrock = config.isBedrock;
     await storage.clearLogs();
     await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${config.isBedrock ? 'Bedrock' : 'Java'})...`);
+    
+    // DEBUG LOG
+    console.log("BotManager starting with isBedrock:", this.isBedrock, "Config:", config);
 
     try {
       if (this.isBedrock) {

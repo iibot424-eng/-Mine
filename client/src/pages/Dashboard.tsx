@@ -3,10 +3,14 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { Terminal } from "@/components/Terminal";
 import { ConfigForm } from "@/components/ConfigForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Terminal as TerminalIcon, Settings, Cpu } from "lucide-react";
+import { Terminal as TerminalIcon, Settings, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 export default function Dashboard() {
+  const { logout } = useAuth();
+
   return (
     <div className="min-h-screen p-4 md:p-8 space-y-8 relative overflow-hidden">
       {/* CRT Scanline Overlay */}
@@ -14,13 +18,19 @@ export default function Dashboard() {
       
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-primary/30 pb-4">
-        <div>
+        <div className="flex flex-col md:flex-row items-baseline gap-4">
           <h1 className="text-4xl md:text-6xl font-tech text-primary tracking-tighter text-glow">
             ANARCHY_OS
           </h1>
-          <p className="text-muted-foreground font-mono text-sm mt-1">
-            v2.4.0 // AUTONOMOUS_MINECRAFT_UNIT
-          </p>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => logout()}
+            className="text-primary/60 hover:text-primary hover:bg-primary/10 rounded-none font-tech text-xs flex items-center gap-2 border border-primary/20 h-7"
+          >
+            <LogOut className="w-3 h-3" />
+            DISCONNECT_SESSION
+          </Button>
         </div>
         <div className="text-right font-mono text-xs text-primary/60">
           SYSTEM_ID: BOT-8821<br />

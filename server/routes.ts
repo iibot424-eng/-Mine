@@ -4,14 +4,17 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { botManager } from "./bot";
 import { z } from "zod";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  await setupAuth(app);
+  registerAuthRoutes(app);
   
   // --- Config Routes ---
-  app.get(api.config.get.path, async (req, res) => {
+  app.get(api.config.get.path, isAuthenticated, async (req, res) => {
     let config = await storage.getBotConfig();
     if (!config) {
       // Create default if missing
@@ -25,7 +28,7 @@ export async function registerRoutes(
     res.json(config);
   });
 
-  app.post(api.config.update.path, async (req, res) => {
+  app.post(api.config.update.path, isAuthenticated, async (req, res) => {
     try {
       const input = api.config.update.input.parse(req.body);
       console.log("Server received config update:", input);
@@ -38,7 +41,7 @@ export async function registerRoutes(
   });
 
   // --- Bot Control Routes ---
-  app.post(api.bot.start.path, async (req, res) => {
+  app.post(api.bot.start.path, isAuthenticated, async (req, res) => {
     const config = await storage.getBotConfig();
     if (!config) {
       return res.status(400).json({ message: 'No configuration found' });
@@ -59,17 +62,17 @@ export async function registerRoutes(
     }
   });
 
-  app.post(api.bot.stop.path, async (req, res) => {
+  app.post(api.bot.stop.path, isAuthenticated, async (req, res) => {
     botManager.stop();
     res.json({ message: 'Bot stopped' });
   });
 
-  app.get(api.bot.status.path, async (req, res) => {
+  app.get(api.bot.status.path, isAuthenticated, async (req, res) => {
     const status = botManager.getStatus();
     res.json(status);
   });
 
-  app.post(api.bot.chat.path, async (req, res) => {
+  app.post(api.bot.chat.path, isAuthenticated, async (req, res) => {
     const { message } = req.body;
     if (message) {
       botManager.chat(message);
@@ -80,12 +83,12 @@ export async function registerRoutes(
   });
 
   // --- Logs Routes ---
-  app.get(api.logs.list.path, async (req, res) => {
+  app.get(api.logs.list.path, isAuthenticated, async (req, res) => {
     const logs = await storage.getLogs();
     res.json(logs);
   });
 
-  app.delete(api.logs.clear.path, async (req, res) => {
+  app.delete(api.logs.clear.path, isAuthenticated, async (req, res) => {
     await storage.clearLogs();
     res.status(204).send();
   });
