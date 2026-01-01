@@ -115,6 +115,7 @@ export function ConfigForm() {
                           </SelectTrigger>
                           <SelectContent className="bg-card border-primary text-primary font-mono rounded-none">
                             <SelectItem value="1.21.30">1.21.30 (Bedrock)</SelectItem>
+                            <SelectItem value="1.21.2">1.21.2</SelectItem>
                             <SelectItem value="1.20.1">1.20.1</SelectItem>
                             <SelectItem value="1.19.4">1.19.4</SelectItem>
                             <SelectItem value="1.18.2">1.18.2</SelectItem>

@@ -28,16 +28,20 @@ export class DatabaseStorage implements IStorage {
   async updateBotConfig(insertConfig: InsertBotConfig): Promise<BotConfig> {
     const existing = await this.getBotConfig();
     console.log("Storage update request:", insertConfig);
+    const dataToSave = {
+      ...insertConfig,
+      isBedrock: insertConfig.isBedrock === true // Force boolean
+    };
     if (existing) {
       const [updated] = await db
         .update(botConfig)
-        .set(insertConfig)
+        .set(dataToSave)
         .where(eq(botConfig.id, existing.id))
         .returning();
       console.log("Storage updated result:", updated);
       return updated;
     } else {
-      const [created] = await db.insert(botConfig).values(insertConfig).returning();
+      const [created] = await db.insert(botConfig).values(dataToSave).returning();
       console.log("Storage created result:", created);
       return created;
     }
