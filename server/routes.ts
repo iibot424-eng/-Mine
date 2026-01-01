@@ -15,29 +15,36 @@ export async function registerRoutes(
   
   // --- Config Routes ---
   app.get(api.config.get.path, isAuthenticated, async (req, res) => {
-    let config = await storage.getBotConfig();
-    if (!config) {
+    const configs = await storage.getBotConfigs();
+    if (configs.length === 0) {
       // Create default if missing
-      config = await storage.updateBotConfig({
+      const defaultProfile = await storage.updateBotConfig({
+        name: 'Default Profile',
         serverIp: 'localhost',
         serverPort: 25565,
         username: 'AnarchyBot',
         authType: 'offline',
       });
+      return res.json([defaultProfile]);
     }
-    res.json(config);
+    res.json(configs);
   });
 
   app.post(api.config.update.path, isAuthenticated, async (req, res) => {
     try {
       const input = api.config.update.input.parse(req.body);
-      console.log("Server received config update:", input);
-      const updated = await storage.updateBotConfig(input);
+      const id = req.query.id ? parseInt(req.query.id as string) : undefined;
+      const updated = await storage.updateBotConfig(input, id);
       res.json(updated);
     } catch (err) {
-      console.error("Config update validation failed:", err);
       res.status(400).json({ message: 'Invalid config' });
     }
+  });
+
+  app.delete('/api/config/:id', isAuthenticated, async (req, res) => {
+    const id = parseInt(req.params.id);
+    await storage.deleteBotConfig(id);
+    res.status(204).send();
   });
 
   // --- Bot Control Routes ---

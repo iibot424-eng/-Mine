@@ -1,24 +1,46 @@
-import { useBotConfig, useUpdateConfig } from "@/hooks/use-bot";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertBotConfigSchema, type InsertBotConfig } from "@shared/schema";
-import { useEffect } from "react";
-import { Loader2, Save, Cpu, Shield, ShoppingCart, User, Server } from "lucide-react";
+import { type BotConfig, botConfig } from "@shared/schema";
+import { useEffect, useState } from "react";
+import { Loader2, Save, Cpu, Shield, ShoppingCart, User, Server, Plus, Trash2 } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
 
-export function ConfigForm() {
-  const { data: config, isLoading } = useBotConfig();
-  const { mutate: updateConfig, isPending } = useUpdateConfig();
+const configSchema = z.object({
+  name: z.string().min(1, "Profile name is required"),
+  serverIp: z.string().min(1, "Server IP is required"),
+  serverPort: z.number().int().min(1).max(65535),
+  username: z.string().min(1, "Username is required"),
+  authType: z.string(),
+  version: z.string().optional(),
+  masterName: z.string().optional(),
+  isBedrock: z.boolean().default(false),
+  isAutoFarm: z.boolean().default(false),
+  isAutoDefense: z.boolean().default(false),
+  isAutoTrade: z.boolean().default(false),
+});
+
+type InsertBotConfig = z.infer<typeof configSchema>;
+
+export function ConfigForm({ config, isLoading }: { config?: BotConfig[], isLoading: boolean }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
+
+  const currentConfig = config?.find(c => c.id === selectedProfileId) || config?.[0];
 
   const form = useForm<InsertBotConfig>({
-    resolver: zodResolver(insertBotConfigSchema),
+    resolver: zodResolver(configSchema),
     defaultValues: {
+      name: "New Profile",
       serverIp: "localhost",
       serverPort: 25565,
       username: "Bot",
@@ -32,33 +54,116 @@ export function ConfigForm() {
     },
   });
 
-  // Reset form when data loads
   useEffect(() => {
-    if (config) {
-      console.log("Config loaded from server:", config);
+    if (currentConfig) {
       form.reset({
-        ...config,
-        isBedrock: config.isBedrock === true,
-        masterName: config.masterName ?? "",
+        ...currentConfig,
+        name: currentConfig.name || "Default Profile",
+        isBedrock: currentConfig.isBedrock === true,
+        masterName: currentConfig.masterName ?? "",
       });
+      setSelectedProfileId(currentConfig.id);
     }
-  }, [config, form]);
+  }, [currentConfig, form]);
 
-  if (isLoading) return <div className="text-primary animate-pulse font-mono">Loading configuration matrix...</div>;
+  const { mutate: updateConfig, isPending } = useMutation({
+    mutationFn: async (data: InsertBotConfig) => {
+      const url = selectedProfileId ? `/api/config?id=${selectedProfileId}` : '/api/config';
+      return await apiRequest("POST", url, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/config"] });
+      toast({ title: "Configuration matrix updated", description: "Profile saved successfully." });
+    }
+  });
+
+  const { mutate: deleteProfile } = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/config/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/config"] });
+      toast({ title: "Profile deleted" });
+      setSelectedProfileId(null);
+    }
+  });
+
+  if (isLoading) return <div className="text-primary animate-pulse font-mono">Loading profiles...</div>;
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => {
-          const formattedData = {
-            ...data,
-            version: data.isBedrock ? (data.version || "1.21.30") : (data.version || "1.20.1"),
-            isBedrock: data.isBedrock ?? false
-          };
-          updateConfig(formattedData as any);
-        })}
-        className="space-y-6"
-      >
+    <div className="space-y-6">
+      <div className="flex gap-2 flex-wrap items-center">
+        {config?.map(profile => (
+          <div key={profile.id} className="flex items-center gap-1">
+            <Button
+              variant={selectedProfileId === profile.id ? "default" : "outline"}
+              onClick={() => setSelectedProfileId(profile.id)}
+              className="font-mono"
+            >
+              {profile.name}
+            </Button>
+            {config.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => deleteProfile(profile.id)}
+                className="text-destructive h-8 w-8"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        ))}
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="border-dashed"
+          onClick={() => {
+            setSelectedProfileId(null);
+            form.reset({
+              name: "New Profile",
+              serverIp: "localhost",
+              serverPort: 25565,
+              username: "Bot",
+              authType: "offline",
+              masterName: "",
+              isAutoFarm: false,
+              isAutoDefense: false,
+              isAutoTrade: false,
+              version: "1.20.1",
+              isBedrock: false,
+            });
+          }}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Profile
+        </Button>
+      </div>
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit((data) => {
+            updateConfig(data);
+          })}
+          className="space-y-6"
+        >
+          <Card className="bg-card/50 border-primary/20 rounded-none">
+            <CardContent className="pt-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-mono text-xs text-muted-foreground uppercase">Profile_Alias</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="bg-black/50 border-primary/30 font-mono text-primary rounded-none focus:border-primary" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* SERVER CONNECTION */}

@@ -10,8 +10,10 @@ import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // Config
-  getBotConfig(): Promise<BotConfig | undefined>;
-  updateBotConfig(config: InsertBotConfig): Promise<BotConfig>;
+  getBotConfig(id?: number): Promise<BotConfig | undefined>;
+  getBotConfigs(): Promise<BotConfig[]>;
+  updateBotConfig(config: InsertBotConfig, id?: number): Promise<BotConfig>;
+  deleteBotConfig(id: number): Promise<void>;
   
   // Logs
   addLog(type: string, message: string): Promise<void>;
@@ -20,31 +22,41 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getBotConfig(): Promise<BotConfig | undefined> {
+  async getBotConfig(id?: number): Promise<BotConfig | undefined> {
+    if (id) {
+      const [config] = await db.select().from(botConfig).where(eq(botConfig.id, id));
+      return config;
+    }
     const configs = await db.select().from(botConfig).limit(1);
     return configs[0];
   }
 
-  async updateBotConfig(insertConfig: InsertBotConfig): Promise<BotConfig> {
-    const existing = await this.getBotConfig();
-    console.log("Storage update request:", insertConfig);
+  async getBotConfigs(): Promise<BotConfig[]> {
+    return await db.select().from(botConfig);
+  }
+
+  async updateBotConfig(insertConfig: InsertBotConfig, id?: number): Promise<BotConfig> {
+    console.log("Storage update request:", insertConfig, "ID:", id);
     const dataToSave = {
       ...insertConfig,
       isBedrock: insertConfig.isBedrock === true // Force boolean
     };
-    if (existing) {
+
+    if (id) {
       const [updated] = await db
         .update(botConfig)
         .set(dataToSave)
-        .where(eq(botConfig.id, existing.id))
+        .where(eq(botConfig.id, id))
         .returning();
-      console.log("Storage updated result:", updated);
       return updated;
-    } else {
-      const [created] = await db.insert(botConfig).values(dataToSave).returning();
-      console.log("Storage created result:", created);
-      return created;
     }
+
+    const [created] = await db.insert(botConfig).values(dataToSave).returning();
+    return created;
+  }
+
+  async deleteBotConfig(id: number): Promise<void> {
+    await db.delete(botConfig).where(eq(botConfig.id, id));
   }
 
   async addLog(type: string, message: string): Promise<void> {

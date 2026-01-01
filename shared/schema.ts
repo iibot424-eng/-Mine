@@ -5,6 +5,7 @@ import { z } from "zod";
 // === TABLE DEFINITIONS ===
 export const botConfig = pgTable("bot_config", {
   id: serial("id").primaryKey(),
+  name: text("name").notNull().default("Default Profile"),
   serverIp: text("server_ip").notNull().default("localhost"),
   serverPort: integer("server_port").notNull().default(25565),
   username: text("username").notNull().default("ReplitBot"),
