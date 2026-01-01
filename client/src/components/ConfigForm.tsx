@@ -35,11 +35,11 @@ export function ConfigForm() {
   // Reset form when data loads
   useEffect(() => {
     if (config) {
-      const data = {
+      form.reset({
         ...config,
-        isBedrock: !!config.isBedrock,
-      } as InsertBotConfig;
-      form.reset(data);
+        isBedrock: config.isBedrock ?? false,
+        masterName: config.masterName ?? "",
+      });
     }
   }, [config, form]);
 
