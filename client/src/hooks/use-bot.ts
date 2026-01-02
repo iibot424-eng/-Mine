@@ -54,8 +54,9 @@ export function useStartBot() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async () => {
-      const res = await fetch(api.bot.start.path, {
+    mutationFn: async (id?: number) => {
+      const url = id ? `${api.bot.start.path}?id=${id}` : api.bot.start.path;
+      const res = await fetch(url, {
         method: api.bot.start.method,
       });
       

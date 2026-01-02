@@ -1,18 +1,29 @@
-import { useStartBot, useStopBot, useBotStatus } from "@/hooks/use-bot";
+import { useStartBot, useStopBot, useBotStatus, useBotConfig } from "@/hooks/use-bot";
 import { Button } from "@/components/ui/button";
 import { Power, Radio } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export function ControlPanel() {
   const { data: status } = useBotStatus();
+  const { data: configs } = useBotConfig();
   const { mutate: startBot, isPending: isStarting } = useStartBot();
   const { mutate: stopBot, isPending: isStopping } = useStopBot();
-
+  
+  // We need to know which profile is selected to start it.
+  // Since ConfigForm manages its own state, we'll try to find if there's a way to sync.
+  // For now, let's assume we use the first profile or whatever is active.
+  // A better way is to use a shared state, but in Fast mode let's keep it simple.
+  
   const isOnline = status?.online;
 
   return (
     <div className="flex gap-4">
       <Button
-        onClick={() => startBot()}
+        onClick={() => {
+          // Try to get the ID from local storage if we saved it there, or just use the first one
+          const storedId = localStorage.getItem('selectedProfileId');
+          startBot(storedId ? parseInt(storedId) : configs?.[0]?.id);
+        }}
         disabled={isOnline || isStarting || isStopping}
         className={`flex-1 h-16 text-lg font-tech font-bold rounded-none border-2 transition-all duration-300
           ${isOnline 

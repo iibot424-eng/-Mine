@@ -74,6 +74,7 @@ export function ConfigForm() {
         isAutoTrade: currentConfig.isAutoTrade || false,
       });
       setSelectedProfileId(currentConfig.id);
+      localStorage.setItem('selectedProfileId', currentConfig.id.toString());
     }
   }, [currentConfig, form]);
 

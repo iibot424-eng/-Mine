@@ -21,15 +21,26 @@ class BotManager {
     return this._status;
   }
 
-  async start(config: { host: string; port: number; username: string; version?: string; auth: 'offline' | 'microsoft' | 'bedrock'; isBedrock: boolean }) {
+  async start(config: { 
+    host: string; 
+    port: number; 
+    username: string; 
+    version?: string; 
+    auth: 'offline' | 'microsoft' | 'bedrock'; 
+    isBedrock: boolean;
+    autoFarm?: boolean;
+    autoDefense?: boolean;
+    autoTrade?: boolean;
+  }) {
     if (this.bot) return;
 
     this.isBedrock = config.isBedrock;
     await storage.clearLogs();
     await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${config.isBedrock ? 'Bedrock' : 'Java'})...`);
     
-    // DEBUG LOG
-    console.log("BotManager starting with isBedrock:", this.isBedrock, "Config:", config);
+    if (config.autoFarm) await storage.addLog('info', 'Auto-farm subroutine ACTIVE');
+    if (config.autoDefense) await storage.addLog('info', 'Auto-defense subroutine ACTIVE');
+    if (config.autoTrade) await storage.addLog('info', 'Auto-trade subroutine ACTIVE');
 
     try {
       if (this.isBedrock) {
@@ -49,7 +60,7 @@ class BotManager {
           port: config.port,
           username: config.username,
           version: config.version || undefined,
-          auth: 'offline', // Force offline for Java
+          auth: 'offline',
           checkTimeoutInterval: 60000,
           hideErrors: false
         });

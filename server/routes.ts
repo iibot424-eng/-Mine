@@ -49,7 +49,9 @@ export async function registerRoutes(
 
   // --- Bot Control Routes ---
   app.post(api.bot.start.path, isAuthenticated, async (req, res) => {
-    const config = await storage.getBotConfig();
+    const id = req.query.id ? parseInt(req.query.id as string) : undefined;
+    const config = await storage.getBotConfig(id);
+    
     if (!config) {
       return res.status(400).json({ message: 'No configuration found' });
     }
@@ -59,9 +61,12 @@ export async function registerRoutes(
         host: config.serverIp,
         port: config.serverPort,
         username: config.username,
-        version: config.version || (config.isBedrock ? '1.19.50' : '1.20.1'),
+        version: config.version || (config.isBedrock ? '1.21.30' : '1.20.1'),
         auth: (config.isBedrock ? 'bedrock' : config.authType) as 'offline' | 'microsoft' | 'bedrock',
         isBedrock: config.isBedrock || false,
+        autoFarm: config.isAutoFarm || false,
+        autoDefense: config.isAutoDefense || false,
+        autoTrade: config.isAutoTrade || false,
       });
       res.json({ message: 'Bot starting...' });
     } catch (err: any) {
