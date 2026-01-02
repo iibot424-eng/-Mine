@@ -13,13 +13,8 @@ type ChatInput = z.infer<typeof api.bot.chat.input>;
 // === HOOKS ===
 
 export function useBotConfig() {
-  return useQuery({
-    queryKey: [api.config.get.path],
-    queryFn: async () => {
-      const res = await fetch(api.config.get.path);
-      if (!res.ok) throw new Error("Failed to fetch config");
-      return api.config.get.responses[200].parse(await res.json());
-    },
+  return useQuery<BotConfig[]>({
+    queryKey: ["/api/config"],
   });
 }
 
@@ -28,30 +23,15 @@ export function useUpdateConfig() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: UpdateConfigInput) => {
-      const res = await fetch(api.config.update.path, {
-        method: api.config.update.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      
-      if (!res.ok) throw new Error("Failed to update config");
-      return api.config.update.responses[200].parse(await res.json());
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/config", data);
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.config.get.path] });
+      queryClient.invalidateQueries({ queryKey: ["/api/config"] });
       toast({
-        title: "SYSTEM UPDATE",
-        description: "Configuration parameters updated successfully.",
-        className: "border-primary text-primary bg-black font-mono",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "ERROR",
-        description: error.message,
-        variant: "destructive",
-        className: "font-mono",
+        title: "Configuration updated",
+        description: "Your bot settings have been saved.",
       });
     },
   });
