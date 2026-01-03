@@ -1,7 +1,7 @@
 FROM node:20-slim
 WORKDIR /app
 
-# Install build dependencies for native modules (raknet-native)
+# Install build dependencies for native modules
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
@@ -12,9 +12,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm install
+# Увеличим время ожидания для установки тяжелых модулей
+RUN npm install --network-timeout 100000
 COPY . .
 RUN npm run build
+
+# Render автоматически прокидывает PORT, мы просто слушаем его
 EXPOSE 5000
-ENV PORT=5000
+ENV NODE_ENV=production
 CMD ["npm", "start"]
