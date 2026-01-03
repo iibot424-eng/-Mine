@@ -2,11 +2,14 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from "@shared/schema";
 
-const databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
+let databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL or NEON_DATABASE_URL must be set");
 }
+
+// Очистка строки от кавычек и префикса psql, если они есть
+databaseUrl = databaseUrl.replace(/^psql\s+/, '').replace(/['"]/g, '').trim();
 
 const sql = neon(databaseUrl);
 export const db = drizzle(sql, { schema });
