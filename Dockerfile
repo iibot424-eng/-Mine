@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-# Увеличим время ожидания для установки тяжелых модулей
-RUN npm install --network-timeout 100000
+# Установка зависимостей без лишних флагов
+RUN npm install
 COPY . .
 RUN npm run build
 
