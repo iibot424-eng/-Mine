@@ -41,3 +41,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_log_in_with_replit:2.0.0"]
+
+[userenv]
+
+[userenv.shared]
+NEON_DATABASE_URL = "psql 'postgresql://neondb_owner:npg_vULpqH3CBYQ9@ep-damp-mud-a450sf1k-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'"
