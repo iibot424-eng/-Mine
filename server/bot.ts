@@ -34,9 +34,11 @@ class BotManager {
   }) {
     if (this.bot) return;
 
+    // ОБЯЗАТЕЛЬНО: Устанавливаем флаг isBedrock ДО начала подключения
     this.isBedrock = config.isBedrock;
+    
     await storage.clearLogs();
-    await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${config.isBedrock ? 'Bedrock' : 'Java'})...`);
+    await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${this.isBedrock ? 'Bedrock' : 'Java'})...`);
     
     if (config.autoFarm) await storage.addLog('info', 'Auto-farm subroutine ACTIVE');
     if (config.autoDefense) await storage.addLog('info', 'Auto-defense subroutine ACTIVE');
@@ -44,6 +46,7 @@ class BotManager {
 
     try {
       if (this.isBedrock) {
+        console.log("Initializing Bedrock client...");
         this.bot = bedrock.createClient({
           host: config.host,
           port: config.port,
@@ -51,10 +54,11 @@ class BotManager {
           offline: true,
           version: config.version as any || '1.21.30',
           skipPing: true,
-          connectTimeout: 10000
+          connectTimeout: 15000 // Увеличим таймаут для Bedrock
         });
         this.setupBedrockEvents();
       } else {
+        console.log("Initializing Java client (mineflayer)...");
         this.bot = mineflayer.createBot({
           host: config.host,
           port: config.port,

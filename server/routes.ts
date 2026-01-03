@@ -49,12 +49,17 @@ export async function registerRoutes(
 
   // --- Bot Control Routes ---
   app.post(api.bot.start.path, isAuthenticated, async (req, res) => {
-    const id = req.query.id ? parseInt(req.query.id as string) : undefined;
+    // Получаем ID из query или из последнего сохраненного профиля в БД
+    const idParam = req.query.id as string;
+    const id = idParam ? parseInt(idParam) : undefined;
+    
     const config = await storage.getBotConfig(id);
     
     if (!config) {
       return res.status(400).json({ message: 'No configuration found' });
     }
+
+    console.log(`Starting bot with profile: ${config.name} (ID: ${config.id}, Bedrock: ${config.isBedrock})`);
 
     try {
       await botManager.start({
@@ -63,13 +68,14 @@ export async function registerRoutes(
         username: config.username,
         version: config.version || (config.isBedrock ? '1.21.30' : '1.20.1'),
         auth: (config.isBedrock ? 'bedrock' : config.authType) as 'offline' | 'microsoft' | 'bedrock',
-        isBedrock: config.isBedrock || false,
-        autoFarm: config.isAutoFarm || false,
-        autoDefense: config.isAutoDefense || false,
-        autoTrade: config.isAutoTrade || false,
+        isBedrock: config.isBedrock === true, // Принудительно boolean
+        autoFarm: config.isAutoFarm === true,
+        autoDefense: config.isAutoDefense === true,
+        autoTrade: config.isAutoTrade === true,
       });
       res.json({ message: 'Bot starting...' });
     } catch (err: any) {
+      console.error("Bot start error:", err);
       res.status(400).json({ message: err.message });
     }
   });
