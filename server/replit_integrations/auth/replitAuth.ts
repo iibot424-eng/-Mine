@@ -30,11 +30,11 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false, // Set to false for compatibility if not using HTTPS correctly
       maxAge: sessionTtl,
     },
   });
@@ -70,8 +70,12 @@ export async function setupAuth(app: Express) {
   passport.deserializeUser((user: any, cb) => cb(null, user));
 
   app.get("/api/login", (req, res) => {
-    const user = { claims: { sub: "static-user", email: "user@render.local", first_name: "Admin" } };
-    req.login(user, () => res.redirect("/"));
+    const user = { id: "static-user", claims: { sub: "static-user", email: "user@render.local", first_name: "Admin" } };
+    req.login(user, () => {
+      req.session.save(() => {
+        res.redirect("/");
+      });
+    });
   });
 
   app.get("/api/callback", (req, res) => res.redirect("/"));
