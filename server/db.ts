@@ -1,6 +1,9 @@
 import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
+import { neon, neonConfig } from '@neondatabase/serverless';
 import * as schema from "@shared/schema";
+
+// This is required for neon-http to work correctly with some versions of drizzle
+neonConfig.fetchConnectionCache = true;
 
 let databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
