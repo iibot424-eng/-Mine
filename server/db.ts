@@ -1,9 +1,7 @@
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pkg from 'pg';
+const { Pool } = pkg;
 import * as schema from "@shared/schema";
-
-// This is required for neon-http to work correctly with some versions of drizzle
-neonConfig.fetchConnectionCache = true;
 
 let databaseUrl = process.env.NEON_DATABASE_URL || process.env.DATABASE_URL;
 
@@ -14,5 +12,9 @@ if (!databaseUrl) {
 // Очистка строки от кавычек и префикса psql, если они есть
 databaseUrl = databaseUrl.replace(/^psql\s+/, '').replace(/['"]/g, '').trim();
 
-const sql = neon(databaseUrl);
-export const db = drizzle(sql, { schema });
+export const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl: true,
+});
+
+export const db = drizzle(pool, { schema });
