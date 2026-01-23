@@ -7,6 +7,7 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { authStorage } from "./storage";
+import { pool } from "../../db";
 
 const getOidcConfig = memoize(
   async () => {
@@ -22,10 +23,10 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
-    conString: (process.env.NEON_DATABASE_URL || process.env.DATABASE_URL)?.replace(/^psql\s+/, '').replace(/['"]/g, '').trim(),
-    createTableIfMissing: false,
-    ttl: sessionTtl,
+    pool: pool,
     tableName: "sessions",
+    createTableIfMissing: true,
+    ttl: sessionTtl,
   });
   return session({
     secret: process.env.SESSION_SECRET!,
