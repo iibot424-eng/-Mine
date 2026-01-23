@@ -39,7 +39,7 @@ export class DatabaseStorage implements IStorage {
     console.log("Storage update request:", insertConfig, "ID:", id);
     const dataToSave = {
       ...insertConfig,
-      isBedrock: insertConfig.isBedrock === true // Force boolean
+      isBedrock: insertConfig.isBedrock === true
     };
 
     if (id) {
@@ -48,6 +48,11 @@ export class DatabaseStorage implements IStorage {
         .set(dataToSave)
         .where(eq(botConfig.id, id))
         .returning();
+      if (!updated) {
+        // Fallback to insert if update fails to find the record
+        const [inserted] = await db.insert(botConfig).values(dataToSave).returning();
+        return inserted;
+      }
       return updated;
     }
 
