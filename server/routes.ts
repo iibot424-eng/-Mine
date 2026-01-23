@@ -33,10 +33,13 @@ export async function registerRoutes(
   app.post(api.config.update.path, isAuthenticated, async (req, res) => {
     try {
       const input = api.config.update.input.parse(req.body);
-      const id = req.query.id ? parseInt(req.query.id as string) : undefined;
+      const idParam = req.query.id as string;
+      const id = idParam ? parseInt(idParam) : undefined;
+      console.log("Updating config with ID:", id, "Data:", input);
       const updated = await storage.updateBotConfig(input, id);
       res.json(updated);
     } catch (err) {
+      console.error("Config update error:", err);
       res.status(400).json({ message: 'Invalid config' });
     }
   });

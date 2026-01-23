@@ -82,7 +82,7 @@ export function ConfigForm() {
     mutationFn: async (data: InsertBotConfig) => {
       const url = selectedProfileId ? `/api/config?id=${selectedProfileId}` : '/api/config';
       const res = await apiRequest("POST", url, data);
-      return await res.json();
+      return res.ok ? await res.json() : null;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/config"] });
