@@ -48,11 +48,6 @@ export class DatabaseStorage implements IStorage {
         .set(dataToSave)
         .where(eq(botConfig.id, id))
         .returning();
-      if (!updated) {
-        // Fallback to insert if update fails to find the record
-        const [inserted] = await db.insert(botConfig).values(dataToSave).returning();
-        return inserted;
-      }
       return updated;
     }
 
