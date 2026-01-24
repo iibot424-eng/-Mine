@@ -3,10 +3,10 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import * as schema from "@shared/schema";
 
-let databaseUrl = process.env.DATABASE_URL;
+let databaseUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
 
 if (!databaseUrl) {
-  throw new Error("DATABASE_URL must be set");
+  throw new Error("DATABASE_URL or NEON_DATABASE_URL must be set");
 }
 
 // Очистка строки от кавычек и префикса psql, если они есть
