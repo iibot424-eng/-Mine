@@ -50,7 +50,7 @@ export async function setupAuth(app: Express) {
 
   passport.deserializeUser(async (id: any, done) => {
     try {
-      const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+      const [user] = await db.select().from(users).where(eq(users.id, String(id))).limit(1);
       if (!user) {
         return done(null, false);
       }
