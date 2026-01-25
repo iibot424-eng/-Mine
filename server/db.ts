@@ -12,9 +12,11 @@ if (!databaseUrl) {
 // Очистка строки от кавычек и префикса psql, если они есть
 databaseUrl = databaseUrl.replace(/^psql\s+/, '').replace(/['"]/g, '').trim();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: true,
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 export const db = drizzle(pool, { schema });

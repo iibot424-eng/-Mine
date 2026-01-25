@@ -48,6 +48,18 @@ export class DatabaseStorage implements IStorage {
         .set(dataToSave)
         .where(eq(botConfig.id, id))
         .returning();
+      
+      if (updated) return updated;
+    }
+
+    // If no ID or update failed to find record, try to update the first record or insert
+    const configs = await db.select().from(botConfig).limit(1);
+    if (configs.length > 0) {
+      const [updated] = await db
+        .update(botConfig)
+        .set(dataToSave)
+        .where(eq(botConfig.id, configs[0].id))
+        .returning();
       return updated;
     }
 
