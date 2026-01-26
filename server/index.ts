@@ -85,6 +85,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || "10000", 10);
+  app.set("trust proxy", 1); // Trust the Render proxy for secure sessions
   httpServer.listen(
     {
       port,

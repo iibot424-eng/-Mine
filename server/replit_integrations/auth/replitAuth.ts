@@ -15,6 +15,7 @@ export async function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "anarchy-os-secret",
     resave: false,
     saveUninitialized: false,
+    proxy: true, // Required for secure cookies behind a proxy like Render
     store: new PostgresStore({
       pool,
       tableName: "sessions",
@@ -22,7 +23,8 @@ export async function setupAuth(app: Express) {
     }),
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
     },
   };
 
