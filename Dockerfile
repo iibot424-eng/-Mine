@@ -18,6 +18,6 @@ COPY . .
 RUN npm run build
 
 # Render автоматически прокидывает PORT, мы просто слушаем его
-EXPOSE 5000
+EXPOSE 10000
 ENV NODE_ENV=production
 CMD ["npm", "start"]
