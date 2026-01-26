@@ -59,15 +59,17 @@ class BotManager {
         this.setupBedrockEvents();
       } else {
         console.log("Initializing Java client (mineflayer)...");
-        this.bot = mineflayer.createBot({
+        const botOptions: any = {
           host: config.host,
           port: config.port,
           username: config.username,
           version: config.version || undefined,
-          auth: 'offline',
+          auth: config.auth === 'microsoft' ? 'microsoft' : 'offline',
           checkTimeoutInterval: 60000,
           hideErrors: false
-        });
+        };
+        console.log(`Mineflayer options: ${JSON.stringify({ ...botOptions, password: '[REDACTED]' })}`);
+        this.bot = mineflayer.createBot(botOptions);
         this.setupJavaEvents();
       }
       this.startAutoEat();
