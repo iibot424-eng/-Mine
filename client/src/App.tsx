@@ -117,13 +117,11 @@ function Router() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
-
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/">
+        {isAuthenticated ? <Dashboard /> : <LoginPage />}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
