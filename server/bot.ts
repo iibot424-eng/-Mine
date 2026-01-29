@@ -37,8 +37,10 @@ class BotManager {
     // ОБЯЗАТЕЛЬНО: Устанавливаем флаг isBedrock ДО начала подключения
     this.isBedrock = config.isBedrock;
     
-    await storage.clearLogs();
     await storage.addLog('info', `Connecting to ${config.host}:${config.port} as ${config.username} (${this.isBedrock ? 'Bedrock' : 'Java'})...`);
+    
+    // Feature log already in DB, but let's persist it if needed
+    // ... Existing feature log logic ...
     
     if (config.autoFarm) await storage.addLog('info', 'Auto-farm subroutine ACTIVE');
     if (config.autoDefense) await storage.addLog('info', 'Auto-defense subroutine ACTIVE');
