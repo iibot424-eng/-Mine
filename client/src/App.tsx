@@ -122,7 +122,10 @@ function Router() {
       <Route path="/">
         {isAuthenticated ? <Dashboard /> : <LoginPage />}
       </Route>
-      <Route component={NotFound} />
+      {/* Ensure any other route also checks auth */}
+      <Route path="/:rest*">
+        {isAuthenticated ? <Dashboard /> : <LoginPage />}
+      </Route>
     </Switch>
   );
 }
