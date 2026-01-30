@@ -27,7 +27,6 @@ export async function setupAuth(app: Express) {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       httpOnly: true,
     },
-    proxy: true,
   };
 
   app.use(session(sessionSettings));
