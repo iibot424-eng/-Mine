@@ -124,7 +124,13 @@ function Router() {
       </Route>
       {/* Ensure any other route also checks auth */}
       <Route path="/:rest*">
-        {isAuthenticated ? <Dashboard /> : <LoginPage />}
+        {isAuthenticated ? (
+          <Dashboard />
+        ) : (
+          <div className="min-h-screen bg-black flex items-center justify-center">
+             <LoginPage />
+          </div>
+        )}
       </Route>
     </Switch>
   );
