@@ -36,12 +36,20 @@ export async function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`[auth] Attempting login for user: ${username}`);
         const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
-        if (!user || user.password !== password) {
+        if (!user) {
+          console.log(`[auth] User not found: ${username}`);
           return done(null, false, { message: "Invalid username or password" });
         }
+        if (user.password !== password) {
+          console.log(`[auth] Invalid password for user: ${username}`);
+          return done(null, false, { message: "Invalid username or password" });
+        }
+        console.log(`[auth] Login successful for user: ${username}`);
         return done(null, user);
       } catch (err) {
+        console.error(`[auth] Database error during login:`, err);
         return done(err);
       }
     })

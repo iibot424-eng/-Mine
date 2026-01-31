@@ -14,9 +14,11 @@ databaseUrl = databaseUrl.replace(/^psql\s+/, '').replace(/['"]/g, '').trim();
 
 const isProduction = process.env.NODE_ENV === "production";
 
+console.log(`[db] Connecting to database... (SSL: ${isProduction})`);
+
 export const pool = new Pool({
   connectionString: databaseUrl,
-  ssl: isProduction ? { rejectUnauthorized: false } : false,
+  ssl: { rejectUnauthorized: false }, // Always allow for Neon/Render
 });
 
 export const db = drizzle(pool, { schema });

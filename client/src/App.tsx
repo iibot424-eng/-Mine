@@ -22,9 +22,10 @@ function LoginPage() {
     e.preventDefault();
     loginMutation.mutate({ username, password }, {
       onError: (error: any) => {
+        const message = error.message || (error.response?.data?.message) || "Invalid credentials";
         toast({
           title: "Access Denied",
-          description: error.message || "Invalid credentials",
+          description: message,
           variant: "destructive",
         });
       }
